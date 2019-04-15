@@ -141,6 +141,6 @@ test('#deserialize(string: String)', function() {
 test('#isException(error: any)', function() {
     var ex = new Ex();
 
-    assert.isTrue(Ex.IsException(ex));
-    assert.isNotTrue(Ex.IsException(null));
+    assert.isTrue(Ex.isException(ex));
+    assert.isNotTrue(Ex.isException(null));
 });
