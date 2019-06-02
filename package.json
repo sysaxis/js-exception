@@ -1,6 +1,6 @@
 {
   "name": "js-exception",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Define exceptions that are loggable in server and consumable in applications.",
   "keywords": ["error", "exception", "js-exception", "error code"],
   "main": "lib/Exception.js",
@@ -10,6 +10,13 @@
   },
   "scripts": {
     "test": "node test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sysaxis/js-exception.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sysaxis/js-exception/issues"
   },
   "author": "sysaxis",
   "license": "MIT",
