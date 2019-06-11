@@ -1,8 +1,13 @@
 {
   "name": "js-exception",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Define exceptions that are loggable in server and consumable in applications.",
-  "keywords": ["error", "exception", "js-exception", "error code"],
+  "keywords": [
+    "error",
+    "exception",
+    "js-exception",
+    "error code"
+  ],
   "main": "lib/Exception.js",
   "directories": {
     "lib": "lib",
@@ -23,6 +28,6 @@
   "dependencies": {},
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^6.1.3"
+    "mocha": "^6.1.4"
   }
 }
