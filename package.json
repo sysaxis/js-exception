@@ -1,6 +1,6 @@
 {
   "name": "js-exception",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Define exceptions that are loggable in server and consumable in applications.",
   "keywords": [
     "error",
