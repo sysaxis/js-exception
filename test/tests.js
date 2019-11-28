@@ -1,6 +1,7 @@
 "use strict";
 
 const {assert} = require('chai');
+const Promise = require('bluebird');
 
 
 const Exception = require('..');
@@ -89,6 +90,55 @@ test('adding custom information', function() {
     assert.ownInclude(ex, {
         waiting: true
     });
+});
+
+test('long stack trace avoidance', function() {
+
+    function throwsError() {
+        var current = function() {
+            var error = new Error('my error');
+            throw new Ex(error).TooEasy();
+        }
+    
+        var fstack = [current];
+        var i = 0;
+        while(i++ < 20) {
+            function next() {
+                fstack.pop()();
+            }
+    
+            fstack.push(next);
+        }
+    
+        return fstack[fstack.length - 1]();
+    }
+
+    try {
+        throwsError();
+    }
+    catch(error) {
+        assert.equal(error.stack.split('node_modules').length, 1);
+    }
+
+    function throwsPromiseError() {
+        return Promise
+            .try(() =>
+            Promise.try(() => 
+            Promise.try(() => 
+            Promise.try(() =>
+            Promise.try(() =>
+            Promise.try(() =>
+            Promise.try(() =>
+            Promise.try(() => {
+                var err = new Error('my error');
+                throw new Ex(err).TooEasy();
+            }))))))));
+    }
+
+    return throwsPromiseError()
+        .catch(error => {
+            assert.equal(error.stack.split('node_modules').length, 1)
+        });
 });
 
 test('#toString()', function() {

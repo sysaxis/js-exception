@@ -6,6 +6,7 @@
 * Logger-friendly output and serialization
 * Consume from anywhere
 * Simple and intuitive syntax
+* Traces of node_modules removed from stack (default)
 * No dependencies
 
 ## Why?
@@ -79,6 +80,13 @@ switch(ex.codename) {
     default:
         // unhandled Exception or unknown Error
 }
+```
+
+## Configuration
+
+### Keeping node_module traces
+```js
+Exception.keepModuleTraces = true;
 ```
 
 ## Test
