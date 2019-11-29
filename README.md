@@ -14,9 +14,9 @@
 
 Sometimes an application produces known errors (exceptions) that need to be recognized and handled appropriately.
 
-**js-exception** allows creating unique Error types with optional default values. The error instances created from the unique types can be caught using filters or identified with inheritance checks (i.e instanceof).
+Exception (**js-exception**) allows creating unique Error types with optional default values.
 
-Throwing or creating such errors is able to wrap the application produced error and allows adding proprietary information for later debbuging or handling the exception.
+Exception instances can wrap the application produced error and allow adding proprietary information for later debbuging or handling the error. They can be caught using filters or identified with inheritance checks (i.e instanceof).
 
 ## Usage
 
