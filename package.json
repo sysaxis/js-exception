@@ -1,6 +1,6 @@
 {
   "name": "js-exception",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Define exceptions that are loggable in server and consumable in applications.",
   "keywords": [
     "error",
@@ -14,7 +14,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "node test"
+    "test": "node test",
+    "build": "build.js"
   },
   "repository": {
     "type": "git",

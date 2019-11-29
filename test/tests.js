@@ -8,43 +8,51 @@ const Exception = require('..');
 
 class Ex extends Exception {
     get TooBusy() {
-        return this.create(1, 'TOO_BUZY')
+        return this.create({
+            code: 1,
+            codename: 'TOO_BUZY'
+        })
     }
 
     get TooSlow() {
-        return this.create(2, 'TOO_SLOW');
+        return this.create({
+            code: 2,
+            codename: 'TOO_SLOW'
+        });
     }
 
     get TooSimple() {
-        return this.create('WAY_TOO_SIMPLE');
+        return this.create({
+            codename: 'WAY_TOO_SIMPLE'
+        });
     }
 
     get TooEasy() {
-        return this.create(0);
+        return this.create();
     }
+}
+
+const Exs = {
+    TooBuzy: Ex.define({
+        codename: 'TOO_BUZY',
+        message: 'I am a default error message'
+    }),
+    TooSlow: Ex.define({codename: 'TOO_SLOW'}),
+    TooSimple: Ex.define({codename: 'TOO_SIMPLE'})
 }
 
 suite('Exception');
 
 var ex;
 
-test('exception defined with code and codename', function() {
+test('exception defined with custom params', function() {
     ex = new Ex().TooBusy();
-
     assert.strictEqual(ex.code, 1);
     assert.strictEqual(ex.codename, 'TOO_BUZY');
-});
 
-test('exception defined with codename only', function() {
-    ex = new Ex().TooSimple();
-
-    assert.strictEqual(ex.codename, 'WAY_TOO_SIMPLE');
-});
-
-test('exception defined with code only', function() {
-    ex = new Ex().TooEasy();
-
-    assert.strictEqual(ex.code, 0);
+    ex = new Exs.TooBuzy();
+    assert.strictEqual(ex.codename, 'TOO_BUZY');
+    assert.strictEqual(ex.message, 'I am a default error message');
 });
 
 test('new Exception(error: Error)', function() {
@@ -64,10 +72,34 @@ test('new Exception(error: String)', function() {
 test('new Exception(error: Object)', function() {
     ex = new Ex({a: 1});
 
-    assert.hasAllKeys(ex, ['message', 'stack']);
+    assert.hasAllKeys(ex, ['a', 'message', 'stack']);
 });
 
-test ('new Exception(error: undefined)', function() {
+test('new Exception(...arguments)', function() {
+    const error = new Error();
+    const message = 'something bad happened';
+    const params = {a: 1};
+
+    ex = new Ex(error, message, params);
+    assert.ownInclude(ex, Object.assign({}, error, {message}, params));
+
+    ex = new Ex(message, params, error);
+    assert.ownInclude(ex, Object.assign({}, params, error));
+
+    ex = new Ex(params, message);
+    assert.ownInclude(ex, Object.assign({}, params, {message}));
+
+    ex = Exs.TooSimple(error, message, params);
+    assert.ownInclude(ex, Object.assign({}, error, {message}, params));
+    
+    ex = Exs.TooSimple(message, params, error);
+    assert.ownInclude(ex, Object.assign({}, params, error));
+
+    ex = Exs.TooSimple(params, message);
+    assert.ownInclude(ex, Object.assign({}, params, {message}));
+})
+
+test('new Exception(error: undefined)', function() {
     ex = new Ex();
 
     assert.hasAllKeys(ex, ['message', 'stack']);
@@ -141,10 +173,22 @@ test('long stack trace avoidance', function() {
         });
 });
 
+test('type checks with instanceof', function() {
+    var ex1 = new Exs.TooSimple();
+    var ex3 = new Exception();
+
+    assert.isTrue(ex1 instanceof Exs.TooSimple);
+    assert.isTrue(ex1 instanceof Exception);
+    assert.isFalse(ex1 instanceof Exs.TooBuzy);
+
+    assert.isTrue(ex3 instanceof Exception);
+    assert.isFalse(ex3 instanceof Exs.TooSimple);
+})
+
 test('#toString()', function() {
     ex = new Ex();
 
-    assert.equal(ex.message || ex.codename, ex.toString());
+    assert.equal('', ex.toString());
 });
 
 test('#toObject()', function() {
@@ -165,12 +209,10 @@ test('#toObject()', function() {
         codename: 'TOO_SLOW'
     }));
 
-    ex = new Ex(error).TooSlow(800);
+    ex = new Ex(error).TooSlow();
     obj = ex.toObject();
 
     assert.deepOwnInclude(obj, Object.assign({}, error, {
-        details: 800
-    },{
         code: 2,
         codename: 'TOO_SLOW'
     }));
@@ -215,3 +257,11 @@ test('#isException(error: any)', function() {
     assert.isTrue(Ex.isException(ex));
     assert.isNotTrue(Ex.isException(null));
 });
+
+test('#is(error)', function() {
+    ex = new Exs.TooSimple();
+
+    assert.isTrue(ex.is(Exs.TooSimple));
+    assert.isFalse(ex.is(Exs.TooBuzy));
+    assert.isFalse(ex.is(Exception));
+})
