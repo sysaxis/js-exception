@@ -1,6 +1,6 @@
 "use strict";
 
-const {assert} = require('chai');
+const {assert, expect} = require('chai');
 const Promise = require('bluebird');
 
 
@@ -183,6 +183,36 @@ test('type checks with instanceof', function() {
 
     assert.isTrue(ex3 instanceof Exception);
     assert.isFalse(ex3 instanceof Exs.TooSimple);
+})
+
+test('catching exception with Promises', function() {
+    return Promise
+        .try(() => {
+            return Promise
+                .try(() => {
+                    throw new Exs.TooSimple()
+                })
+                .catch(Exs.TooSimple, error => {
+                    assert.ok(error);
+                })
+                .catch(error => {
+                    expect.fail('error should have been caught by filter');
+                })
+        })
+        .then(() => {
+            class CustomError extends Error {}
+
+            return Promise
+                .try(() => {
+                    throw new Exs.TooSimple()
+                })
+                .catch(CustomError, error => {
+                    expect.fail('error should not have been caught by filter');
+                })
+                .catch(error => {
+                    assert.ok(error);
+                })
+        })
 })
 
 test('#toString()', function() {
