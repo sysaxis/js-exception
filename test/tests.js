@@ -89,13 +89,13 @@ test('new Exception(...arguments)', function() {
     ex = new Ex(params, message);
     assert.ownInclude(ex, Object.assign({}, params, {message}));
 
-    ex = Exs.TooSimple(error, message, params);
+    ex = new Exs.TooSimple(error, message, params);
     assert.ownInclude(ex, Object.assign({}, error, {message}, params));
     
-    ex = Exs.TooSimple(message, params, error);
+    ex = new Exs.TooSimple(message, params, error);
     assert.ownInclude(ex, Object.assign({}, params, error));
 
-    ex = Exs.TooSimple(params, message);
+    ex = new Exs.TooSimple(params, message);
     assert.ownInclude(ex, Object.assign({}, params, {message}));
 })
 
@@ -200,17 +200,35 @@ test('catching exception with Promises', function() {
                 })
         })
         .then(() => {
-            class CustomError extends Error {}
-
+            var err = new Exs.TooBuzy();
             return Promise
                 .try(() => {
-                    throw new Exs.TooSimple()
+                    throw err;
                 })
-                .catch(CustomError, error => {
-                    expect.fail('error should not have been caught by filter');
+                .catch(Exs.TooSimple, error => {
+                    throw new Error('error was caught by the wrong filter');
                 })
                 .catch(error => {
-                    assert.ok(error);
+                    if (error !== err) {
+                        expect.fail(error.message);
+                    }
+                })
+        })
+        .then(() => {
+            class CustomError extends Error {}
+
+            var err = new Exs.TooSimple();
+            return Promise
+                .try(() => {
+                    throw err;
+                })
+                .catch(CustomError, error => {
+                    throw new Error('error should not have been caught by filter');
+                })
+                .catch(error => {
+                    if (error !== err) {
+                        expect.fail(error.message);
+                    }
                 })
         })
 })
