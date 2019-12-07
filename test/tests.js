@@ -89,6 +89,7 @@ test('new Exception(...arguments)', function() {
 
     ex = new Ex(message, params, error);
     assert.ownInclude(ex, params);
+    assert.equal(ex.message, message);
 
     ex = new Ex(params, message);
     assert.ownInclude(ex, params);
@@ -100,6 +101,7 @@ test('new Exception(...arguments)', function() {
     
     ex = new Exs.TooSimple(message, params, error);
     assert.ownInclude(ex, params);
+    assert.equal(ex.message, message);
 
     ex = new Exs.TooSimple(params, message);
     assert.ownInclude(ex, params);
