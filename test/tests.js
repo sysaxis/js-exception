@@ -67,12 +67,15 @@ test('new Exception(error: String)', function() {
     ex = new Ex(message);
 
     assert.ownInclude(ex, {message});
+    assert.isTrue(ex.stack.startsWith('Error: ' + message + '\n'))
 });
 
 test('new Exception(error: Object)', function() {
-    ex = new Ex({a: 1});
+    var obj = {a: 1};
+    ex = new Ex(obj);
 
-    assert.hasAllKeys(ex, ['a', 'message', 'stack']);
+    assert.ownInclude(ex, obj);
+    assert.equal(ex.message, '');
 });
 
 test('new Exception(...arguments)', function() {
@@ -81,28 +84,33 @@ test('new Exception(...arguments)', function() {
     const params = {a: 1};
 
     ex = new Ex(error, message, params);
-    assert.ownInclude(ex, Object.assign({}, error, {message}, params));
+    assert.ownInclude(ex, params);
+    assert.equal(ex.message, message);
 
     ex = new Ex(message, params, error);
-    assert.ownInclude(ex, Object.assign({}, params, error));
+    assert.ownInclude(ex, params);
 
     ex = new Ex(params, message);
-    assert.ownInclude(ex, Object.assign({}, params, {message}));
+    assert.ownInclude(ex, params);
+    assert.equal(ex.message, message);
 
     ex = new Exs.TooSimple(error, message, params);
-    assert.ownInclude(ex, Object.assign({}, error, {message}, params));
+    assert.ownInclude(ex, params);
+    assert.equal(ex.message, message);
     
     ex = new Exs.TooSimple(message, params, error);
-    assert.ownInclude(ex, Object.assign({}, params, error));
+    assert.ownInclude(ex, params);
 
     ex = new Exs.TooSimple(params, message);
-    assert.ownInclude(ex, Object.assign({}, params, {message}));
+    assert.ownInclude(ex, params);
+    assert.equal(ex.message, message);
 })
 
 test('new Exception(error: undefined)', function() {
     ex = new Ex();
 
-    assert.hasAllKeys(ex, ['message', 'stack']);
+    assert.equal(ex.message, '');
+    assert.isTrue(ex.stack.startsWith('Error\n'))
 });
 
 test('creating with typed error name', function() {
