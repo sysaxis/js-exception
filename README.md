@@ -8,7 +8,6 @@
 * Application root path and traces of node_modules are removed from stack (default)
 * Logger-friendly output and serialization
 * Simple and intuitive syntax
-* No dependencies
 
 ## Why?
 

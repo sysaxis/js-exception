@@ -243,6 +243,21 @@ test('catching exception with Promises', function() {
         })
 })
 
+test('instance params should not mix', function() {
+    var ex1 = new Exs.TooSimple({
+        param1: 'value1'
+    })
+
+    assert.exists(ex1.param1)
+
+    var ex2 = new Exs.TooSimple({
+        param2: 'value2'
+    })
+
+    assert.exists(ex2.param2)
+    assert.notExists(ex2.param1)
+})
+
 test('#toString()', function() {
     ex = new Ex();
 
