@@ -6,39 +6,13 @@ const Promise = require('bluebird');
 
 const Exception = require('..');
 
-class Ex extends Exception {
-    get TooBusy() {
-        return this.create({
-            code: 1,
-            codename: 'TOO_BUZY'
-        })
-    }
-
-    get TooSlow() {
-        return this.create({
-            code: 2,
-            codename: 'TOO_SLOW'
-        });
-    }
-
-    get TooSimple() {
-        return this.create({
-            codename: 'WAY_TOO_SIMPLE'
-        });
-    }
-
-    get TooEasy() {
-        return this.create();
-    }
-}
-
 const Exs = {
-    TooBuzy: Ex.define({
+    TooBuzy: Exception.define({
         codename: 'TOO_BUZY',
         message: 'I am a default error message'
     }),
-    TooSlow: Ex.define({codename: 'TOO_SLOW'}),
-    TooSimple: Ex.define({codename: 'TOO_SIMPLE'})
+    TooSlow: Exception.define({codename: 'TOO_SLOW'}),
+    TooSimple: Exception.define({codename: 'TOO_SIMPLE'})
 }
 
 suite('Exception');
@@ -46,10 +20,6 @@ suite('Exception');
 var ex;
 
 test('exception defined with custom params', function() {
-    ex = new Ex().TooBusy();
-    assert.strictEqual(ex.code, 1);
-    assert.strictEqual(ex.codename, 'TOO_BUZY');
-
     ex = new Exs.TooBuzy();
     assert.strictEqual(ex.codename, 'TOO_BUZY');
     assert.strictEqual(ex.message, 'I am a default error message');
@@ -57,14 +27,14 @@ test('exception defined with custom params', function() {
 
 test('new Exception(error: Error)', function() {
     const error = new Error();
-    ex = new Ex(error);
+    ex = new Exception(error);
 
     assert.ownInclude(ex, error);
 });
 
 test('new Exception(error: String)', function() {
     const message = 'something bad happened';
-    ex = new Ex(message);
+    ex = new Exception(message);
 
     assert.ownInclude(ex, {message});
     assert.isTrue(ex.stack.startsWith('Error: ' + message + '\n'))
@@ -72,7 +42,7 @@ test('new Exception(error: String)', function() {
 
 test('new Exception(error: Object)', function() {
     var obj = {a: 1};
-    ex = new Ex(obj);
+    ex = new Exception(obj);
 
     assert.ownInclude(ex, obj);
     assert.equal(ex.message, '');
@@ -83,15 +53,15 @@ test('new Exception(...arguments)', function() {
     const message = 'something bad happened';
     const params = {a: 1};
 
-    ex = new Ex(error, message, params);
+    ex = new Exception(error, message, params);
     assert.ownInclude(ex, params);
     assert.equal(ex.message, message);
 
-    ex = new Ex(message, params, error);
+    ex = new Exception(message, params, error);
     assert.ownInclude(ex, params);
     assert.equal(ex.message, message);
 
-    ex = new Ex(params, message);
+    ex = new Exception(params, message);
     assert.ownInclude(ex, params);
     assert.equal(ex.message, message);
 
@@ -109,29 +79,10 @@ test('new Exception(...arguments)', function() {
 })
 
 test('new Exception(error: undefined)', function() {
-    ex = new Ex();
+    ex = new Exception();
 
     assert.equal(ex.message, '');
     assert.isTrue(ex.stack.startsWith('Error\n'))
-});
-
-test('creating with typed error name', function() {
-    ex = new Ex().TooBusy();
-
-    assert.ownInclude(ex, {
-        code: 1,
-        codename: 'TOO_BUZY'
-    });
-});
-
-test('adding custom information', function() {
-    ex = new Ex().TooBusy({
-        waiting: true
-    });
-
-    assert.ownInclude(ex, {
-        waiting: true
-    });
 });
 
 test('long stack trace avoidance', function() {
@@ -139,7 +90,9 @@ test('long stack trace avoidance', function() {
     function throwsError() {
         var current = function() {
             var error = new Error('my error');
-            throw new Ex(error).TooEasy();
+            throw new Exception(error, {
+                a: 1
+            });
         }
     
         var fstack = [current];
@@ -173,7 +126,7 @@ test('long stack trace avoidance', function() {
             Promise.try(() =>
             Promise.try(() => {
                 var err = new Error('my error');
-                throw new Ex(err).TooEasy();
+                throw new Exception(err, {a: 2});
             }))))))));
     }
 
@@ -259,7 +212,7 @@ test('instance params should not mix', function() {
 })
 
 test('#toString()', function() {
-    ex = new Ex();
+    ex = new Exception();
 
     assert.equal('', ex.toString());
 });
@@ -273,36 +226,25 @@ test('#toObject()', function() {
         speed: 2,
         accelerating: false
     };
-    ex = new Ex(error).TooSlow(params);
+    ex = new Exs.TooSlow(error, params);
 
     var obj = ex.toObject();
     
     assert.deepOwnInclude(obj, Object.assign({}, error, params, {
-        code: 2,
         codename: 'TOO_SLOW'
     }));
 
-    ex = new Ex(error).TooSlow();
+    ex = new Exception(error, {codename: 'TOO_SLOW'});
     obj = ex.toObject();
 
     assert.deepOwnInclude(obj, Object.assign({}, error, {
-        code: 2,
         codename: 'TOO_SLOW'
-    }));
-
-    ex = new Ex().TooSlow('800');
-    obj = ex.toObject();
-
-    assert.deepOwnInclude(obj, Object.assign({}, error, {
-        code: 2,
-        codename: 'TOO_SLOW',
-        message: '800'
     }));
 });
 
 test('#toJSON()', function() {
 
-    ex = new Ex();
+    ex = new Exception();
 
     var json = ex.toJSON(true);
     var expected = `{"stack":"${ex.stack.replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n')}","message":""}`;
@@ -314,21 +256,21 @@ test('#toJSON()', function() {
 });
 
 test('#deserialize(string: String)', function() {
-    ex = new Ex();
+    ex = new Exception();
 
     var obj = ex.toJSON(true);
 
-    var ex2 = Ex.deserialize(obj);
+    var ex2 = Exception.deserialize(obj);
 
-    assert.instanceOf(ex2, Ex);
+    assert.instanceOf(ex2, Exception);
     assert.deepOwnInclude(ex, ex2);
 });
 
 test('#isException(error: any)', function() {
-    ex = new Ex();
+    ex = new Exception();
 
-    assert.isTrue(Ex.isException(ex));
-    assert.isNotTrue(Ex.isException(null));
+    assert.isTrue(Exception.isException(ex));
+    assert.isNotTrue(Exception.isException(null));
 });
 
 test('#is(error)', function() {

@@ -152,7 +152,9 @@ It seemed like the library was forcing a certain error design pattern (with erro
     ```js
     new Exception(error<Error>|message<String>)
     ```
+### 0.8+
 
+1) Removed static method **create()**, use **define()** instead.
 
 ## Test
 

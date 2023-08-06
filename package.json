@@ -1,6 +1,6 @@
 {
   "name": "js-exception",
-  "version": "0.7.7",
+  "version": "0.8.0",
   "description": "Define exceptions that are loggable in server and consumable in applications.",
   "keywords": [
     "error",
@@ -9,13 +9,8 @@
     "error code"
   ],
   "main": "lib/Exception.js",
-  "directories": {
-    "lib": "lib",
-    "test": "test"
-  },
   "scripts": {
-    "test": "node test",
-    "build": "node build.js"
+    "test": "node test"
   },
   "repository": {
     "type": "git",
@@ -32,6 +27,6 @@
   "devDependencies": {
     "bluebird": "^3.7.1",
     "chai": "^4.2.0",
-    "mocha": "^6.2.2"
+    "mocha": "^10.2.0"
   }
 }
