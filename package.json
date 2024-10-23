@@ -1,6 +1,6 @@
 {
   "name": "js-exception",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Define exceptions that are loggable in server and consumable in applications.",
   "keywords": [
     "error",
@@ -8,9 +8,13 @@
     "js-exception",
     "error code"
   ],
-  "main": "lib/Exception.js",
+  "main": "./dist/Exception.js",
+  "exports": {
+    "stacktrace": "./dist/stacktrace.js"
+  },
   "scripts": {
-    "test": "node test"
+    "test": "node test",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -25,8 +29,10 @@
     "clone-deep": "^4.0.1"
   },
   "devDependencies": {
+    "@types/node": "^22.7.9",
     "bluebird": "^3.7.1",
     "chai": "^4.2.0",
-    "mocha": "^10.2.0"
+    "mocha": "^10.2.0",
+    "typescript": "^5.6.3"
   }
 }
